@@ -17,7 +17,9 @@ class Customer {
     String worktype;
     String workplace;
     String phone;
-    List<Realestate> realestates;
+    String qrstatus;
+    String fcmtoken;
+   List<Realestate> realestates;
 
     Customer({
         required this.id,
@@ -28,6 +30,8 @@ class Customer {
         required this.worktype,
         required this.workplace,
         required this.phone,
+        required this.qrstatus,
+        required this.fcmtoken,
         required this.realestates,
     });
 
@@ -40,6 +44,8 @@ class Customer {
         worktype: json["worktype"],
         workplace: json["workplace"],
         phone: json["phone"],
+        qrstatus: json["qrstatus"],
+        fcmtoken: json["fcmtoken"],
         realestates: List<Realestate>.from(json["realestates"].map((x) => Realestate.fromJson(x))),
     );
 
@@ -52,7 +58,9 @@ class Customer {
         "worktype": worktype,
         "workplace": workplace,
         "phone": phone,
-        "realestates": List<dynamic>.from(realestates.map((x) => x.toJson())),
+        "qrstatus": qrstatus,
+        "fcmtoken": fcmtoken,
+       "realestates": List<dynamic>.from(realestates.map((x) => x.toJson())),
     };
 }
 

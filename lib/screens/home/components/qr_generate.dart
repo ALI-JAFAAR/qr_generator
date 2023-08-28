@@ -21,7 +21,7 @@ class GenerateQRCode extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(0xff008e9b),
-          title: const Text('خطا QR'),
+          title: const Text('مشاركة الـ QR'),
           centerTitle: true,
         ),
         body: Center(
@@ -35,7 +35,7 @@ class GenerateQRCode extends StatelessWidget {
                   child: QrImageView(
                     backgroundColor: Colors.white,
                     data: data,
-                    size: 380,
+                    size: 300,
                     embeddedImageStyle: const QrEmbeddedImageStyle(
                       size: Size(
                         100,

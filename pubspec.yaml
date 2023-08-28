@@ -9,7 +9,6 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.2
   google_fonts: ^5.1.0
-  cached_network_image: ^3.1.0
   firebase_auth: ^4.7.3
   firebase_core: ^2.15.1
   qr_flutter: ^4.1.0
@@ -19,12 +18,8 @@ dependencies:
   screenshot: ^2.1.0
   provider: ^5.0.0
   shared_preferences: ^2.0.6
-  lottie: ^2.5.0
-  flutter_cache_manager: ^3.3.0
-  flutter_svg: ^1.1.0
-  font_awesome_flutter: ^10.5.0
-  line_awesome_flutter: ^2.0.0
-  sqflite: ^2.2.8+4
+  firebase_messaging: ^14.6.7
+  flutter_local_notifications: ^15.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter

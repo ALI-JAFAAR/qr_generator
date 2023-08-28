@@ -34,14 +34,6 @@ class _BodyWidgetState extends State<BodyWidget> {
               child: Text(""),
             ),
             ListTile(
-              leading: const Icon(Icons.qr_code),
-              title: const Text("الباركودات الفعالة"),
-              trailing: const Icon(Icons.arrow_forward),
-              onTap: () {
-                // Add your navigation logic here
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.info),
               title: const Text("معلومات التطبيق"),
               trailing: const Icon(Icons.arrow_forward),
@@ -72,19 +64,63 @@ class _BodyWidgetState extends State<BodyWidget> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(
+            right: 16,
+            left: 16,
+          ),
           child: Form(
             key: _formKey,
             child: Column(
               children: [
-                
-                Container(
-                  margin: const EdgeInsets.only(top: 8),
-                  child: Image.asset(
-                    'assets/images/logo.png',
-                    height: 150,
-                    width: 160,
-                  ),
+                Image.asset(
+                  'assets/images/logo.png',
+                  height: 130,
+                  width: 160,
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                const Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.warning_rounded,
+                          color: Colors.amber,
+                          size: 25,
+                        ),
+                        Text(
+                          ' الـ QR مخصص لزائر واحد فقط ',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5,
+                    ),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.warning_rounded,
+                          color: Colors.amber,
+                          size: 25,
+                        ),
+                        Text(
+                          ' الـ QR  صالح لمدة 24 ساعة',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
                 const SizedBox(
                   height: 30,
@@ -136,7 +172,8 @@ class _BodyWidgetState extends State<BodyWidget> {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
                                 value,
                                 style: const TextStyle(fontSize: 16),
@@ -148,21 +185,28 @@ class _BodyWidgetState extends State<BodyWidget> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 30),
                 Row(
                   children: [
-                    Checkbox(
-                      value: _isChecked,
-                      onChanged: (value) {
-                        setState(() {
-                          _isChecked = value!;
-                        });
-                      },
+                    Column(
+                      children: [
+                        Checkbox(
+                          value: _isChecked,
+                          onChanged: (value) {
+                            setState(() {
+                              _isChecked = value!;
+                            });
+                          },
+                        ),
+                        const SizedBox(
+                          height: 40,
+                        ),
+                      ],
                     ),
                     const Flexible(
                       child: Text(
                         'اتعهد بتحمل كافة المسؤليات في حال مخالفة الزائر للقوانين والضوابط الخاصة بالمجمع السكني',
-                        style: TextStyle(fontSize: 14),
+                        style: TextStyle(fontSize: 15),
                       ),
                     ),
                   ],
@@ -202,7 +246,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                     child: const Text(
                       'انشأ الـ QR',
                       style: TextStyle(
-                        fontSize: 20,
+                        fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
