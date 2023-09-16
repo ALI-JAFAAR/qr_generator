@@ -13,6 +13,7 @@ import '../models/cus.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/login/login.dart';
 import '../screens/login/otp.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 class UserProvider extends ChangeNotifier {
   Api api = Api();
@@ -26,31 +27,30 @@ class UserProvider extends ChangeNotifier {
     PhoneAuthCredential credential = PhoneAuthProvider.credential(
         verificationId: verificationId, smsCode: text);
     await auth.signInWithCredential(credential);
-    if (kDebugMode) {
-      print(auth.currentUser!.phoneNumber);
-    }
     auth.currentUser!.displayName;
     if (auth.currentUser != null) {
-      snackbar(context, "مرحبا بك ${userdata.name}");
       Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const HomeScreen(),
-        ),
-      );
+              context,
+              MaterialPageRoute(
+                builder: (context) => const HomeScreen(),
+              ),
+            );
+     
     }
   }
 
   userlogin(BuildContext context, phone) async {
-    final x = await newMethod(
-        'https://www.almawadda-software.com/cims/api/CheckServices.php?Phone=$phone');
-    if (x.body == "Error") {
-      snackbar(context, ' رقم الهاتف غير موجود يرجى مراجعة قسم المعلوماتية ');
-    } else {
+    // final x = await newMethod(
+    //     'https://www.almawadda-software.com/cims/api/CheckServices.php?Phone=$phone');
+    // if (x.body == "Error") {
+    //   snackbar(context, ' رقم الهاتف غير موجود يرجى مراجعة قسم المعلوماتية ');
+    //   return;
+    // } else {
+      SharedPreferences localStorage = await SharedPreferences.getInstance();
       final response = await newMethod(
           'https://almawadda-software.com/cims/api/GetPersonalData.php?Phone=$phone');
       if (response.statusCode == 200) {
-        SharedPreferences localStorage = await SharedPreferences.getInstance();
+
         var phoneNumber = phone;
         phoneNumber = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
         phoneNumber = phoneNumber.replaceFirst(RegExp(r'^0+'), '');
@@ -58,6 +58,7 @@ class UserProvider extends ChangeNotifier {
         phoneNumber = '+964$phoneNumber';
         if (kDebugMode) {
           print(phoneNumber);
+          print(response.body);
         }
         await FirebaseAuth.instance.verifyPhoneNumber(
           phoneNumber: phoneNumber,
@@ -65,57 +66,57 @@ class UserProvider extends ChangeNotifier {
           verificationFailed: (FirebaseAuthException e) {},
           codeSent: (String verificationId, int? resendToken) {
             set_verfy(verificationId);
-            if (kDebugMode) {
-              print("sdufncdcdionodcndoincdciod$verificationId");
-            }
-            if (kDebugMode) {
-              print(response.body);
-            }
             List<List<Customer>> logindata = customerFromJson(response.body);
             userdata = logindata[0][0];
             if (kDebugMode) {
-              print("user login data ${userdata.name}");
+              print("login is occred");
             }
-            localStorage.setInt('id', userdata.id);
-            localStorage.setString('name', userdata.name);
-            localStorage.setString('phone', userdata.phone);
-            localStorage.setString('birth', userdata.birth.toString());
-            localStorage.setString('gender', userdata.gender);
-            localStorage.setString('study', userdata.study);
-            localStorage.setString('worktype', userdata.worktype);
-            localStorage.setString('workplace', userdata.workplace);
-            localStorage.setString('phone', userdata.phone);
-            localStorage.setString('qrstatus', userdata.qrstatus);
-            localStorage.setString('fcmtoken', userdata.fcmtoken);
-            localStorage.setInt('real_id', userdata.realestates[0].id);
-            localStorage.setInt('pid', userdata.realestates[0].pid);
-            localStorage.setString(
-                'compound', userdata.realestates[0].compound);
-            localStorage.setString('address', userdata.realestates[0].address);
-            localStorage.setString('realestateownername',
-                userdata.realestates[0].realestateownername);
-            localStorage.setString(
-                'relation', userdata.realestates[0].relation);
-            localStorage.setString(
-                'housingstatus', userdata.realestates[0].housingstatus);
-            login = true;
+             
+      localStorage.setInt('id', userdata.id);
+      localStorage.setString('name', userdata.name);
+      localStorage.setString('phone', userdata.phone);
+      localStorage.setString('birth', userdata.birth.toString());
+      localStorage.setString('gender', userdata.gender);
+      localStorage.setString('study', userdata.study);
+      localStorage.setString('worktype', userdata.worktype);
+      localStorage.setString('workplace', userdata.workplace);
+      localStorage.setString('phone', userdata.phone);
+      localStorage.setString('qrstatus', userdata.qrstatus);
+      localStorage.setString('fcmtoken', userdata.fcmtoken);
+      localStorage.setInt('real_id', userdata.realestates[0].id);
+      localStorage.setInt('pid', userdata.realestates[0].pid);
+      localStorage.setString('compound', userdata.realestates[0].compound);
+      localStorage.setString('address', userdata.realestates[0].address);
+      localStorage.setString(
+          'realestateownername', userdata.realestates[0].realestateownername);
+      localStorage.setString('relation', userdata.realestates[0].relation);
+      localStorage.setString(
+          'housingstatus', userdata.realestates[0].housingstatus);
+      login = true;
+
+      var id = OneSignal.User.pushSubscription.id;
+      fcmtoken(context, userdata.phone, id);
+    
             notifyListeners();
-            Navigator.push(
+            Navigator.pushReplacement(
               context,
               MaterialPageRoute(
                 builder: (context) => const OTPScreen(),
               ),
             );
           },
-          codeAutoRetrievalTimeout: (String verificationId) {},
+          codeAutoRetrievalTimeout: (String verificationId) {
+          },
         );
       }
-    }
+    // }
   }
 
   check_login(context) async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     if (login == true) {
+      var id = OneSignal.User.pushSubscription.id;
+      fcmtoken(context, localStorage.getString('phone')!, id);
     } else {
       if (localStorage.getInt('id') != null) {
         Realestate resl = Realestate(
@@ -144,13 +145,17 @@ class UserProvider extends ChangeNotifier {
         );
         userdata = da;
         login = true;
-        // snackbar(context, "مرحبا بك مجددا");
+        var id = OneSignal.User.pushSubscription.id;
+        fcmtoken(context, localStorage.getString('phone')!, id);
         if (kDebugMode) {
           print("user login id = ${userdata.id}");
+          var token = OneSignal.User.pushSubscription.id;
+          print("token token = $token");
+          fcmtoken(context, userdata.phone, token);
         }
         notifyListeners();
       } else {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => const Login(),
@@ -239,6 +244,15 @@ class UserProvider extends ChangeNotifier {
           print("error delet account");
         }
       }
+    }
+  }
+
+  fcmtoken(context, phone, token) async {
+    final x = await newMethod(
+        'https://almawadda-software.com/cims/api/UpdateFCMToken.php?Phone=$phone&FCMToken=$token');
+    if (x.body != "Done") {
+      snackbar(context, ' حدث خطا في تحديث كود الاشعار ');
+      return;
     }
   }
 

@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables, avoid_print, non_constant_identifier_names
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../api/api.dart';
 import '../constants.dart';
@@ -10,17 +11,25 @@ class AppProvider extends ChangeNotifier {
   Api api = Api();
   late SnackBar snackBar;
 
-  send_order(visit, user, context) async {
+  send_order(name, number, period, user, context) async {
     var qr_data = user.phone + generateRandomString();
-    var data = {'visitor_name': visit, "data": qr_data, "user": user};
+    var data = {
+      'visitor_name': name,
+      'car_number': number,
+      'period': period,
+      "data": qr_data,
+      "fcmtoken": OneSignal.User.pushSubscription.id,
+      "user": user
+    };
     final response = await newMethod(
         'https://www.almawadda-software.com/cims/api/CheckServices.php?Phone=${user.phone}');
     if (response.statusCode == 200) {
       print(response.body);
       SharedPreferences localStorage = await SharedPreferences.getInstance();
       var status = localStorage.getString('qrstatus')!;
-      if(status == "غير فعال"){
+      if (status == "غير فعال") {
         snackbar(context, ' تم ايقاف الحساب يرجى مراجعة قسم المعلوماتية ');
+        // return ;
       }
       if (response.body == "true") {
         snackbar(context, 'لايمكن توليد الـQR المالك متلكئ عن دفع الخدمات');

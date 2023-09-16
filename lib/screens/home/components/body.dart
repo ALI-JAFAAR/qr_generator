@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '/provider/app.dart';
 
@@ -16,9 +17,11 @@ class BodyWidget extends StatefulWidget {
 class _BodyWidgetState extends State<BodyWidget> {
   final _formKey = GlobalKey<FormState>();
   bool _isChecked = false;
-  String _inputValue = '';
+  String _name = '';
+  String _number = '';
+  String _period = '';
   String _selectedOption = 'اختر صلة القرابة';
-
+  final RegExp _numbersOnly = RegExp(r'\d+');
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<UserProvider>(context);
@@ -141,7 +144,57 @@ class _BodyWidgetState extends State<BodyWidget> {
                       return null;
                     },
                     onChanged: (value) {
-                      _inputValue = value;
+                      _name = value;
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: TextFormField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.allow(_numbersOnly),
+                    ],
+                    decoration: const InputDecoration(
+                      // prefix: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                      labelText: 'مدة الزيارة ',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      _period = value;
+                    },
+                  ),
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width * 0.9,
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      // prefix: Icon(Icons.person),
+                      border: OutlineInputBorder(),
+                      labelText: ' ادخل رقم العجلة ',
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      _number = value;
                     },
                   ),
                 ),
@@ -204,7 +257,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                       ],
                     ),
                     const Flexible(
-                      child: Text(
+                      child: Text( 
                         'اتعهد بتحمل كافة المسؤليات في حال مخالفة الزائر للقوانين والضوابط الخاصة بالمجمع السكني',
                         style: TextStyle(fontSize: 15),
                       ),
@@ -224,8 +277,9 @@ class _BodyWidgetState extends State<BodyWidget> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         if (_isChecked) {
-                          app.send_order(_inputValue, user.userdata, context);
-                          print("Text Input: $_inputValue");
+                          app.send_order(
+                              _name, _number, _period, user.userdata, context);
+                          print("Text Input: $_name");
                           print("Checkbox Checked: $_isChecked");
                           print("Selected Option: $_selectedOption");
                         } else {
@@ -251,6 +305,9 @@ class _BodyWidgetState extends State<BodyWidget> {
                       ),
                     ),
                   ),
+                ),
+                const SizedBox(
+                  height: 50,
                 ),
               ],
             ),

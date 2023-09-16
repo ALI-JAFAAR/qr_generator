@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import '/provider/user.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
 
@@ -16,6 +18,7 @@ class GenerateQRCode extends StatelessWidget {
   GenerateQRCode({super.key, required this.data});
   @override
   Widget build(BuildContext context) {
+    var user = Provider.of<UserProvider>(context);
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
@@ -28,19 +31,113 @@ class GenerateQRCode extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 50,),
+              const SizedBox(
+                height: 20,
+              ),
               Expanded(
                 child: Screenshot(
                   controller: screenshotController,
-                  child: QrImageView(
-                    backgroundColor: Colors.white,
-                    data: data,
-                    size: 300,
-                    embeddedImageStyle: const QrEmbeddedImageStyle(
-                      size: Size(
-                        100,
-                        100,
-                      ),
+                  child: Container(
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                            top: 15,
+                            left: 15,
+                            right: 15,
+                            
+                          ),
+                          child: Text(
+                            ' اهلا وسهلا بكم في مجمع ${user.userdata.realestates[0].compound} ',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        QrImageView(
+                          backgroundColor: Colors.white,
+                          data: data,
+                          size: 300,
+                          embeddedImageStyle: const QrEmbeddedImageStyle(
+                            size: Size(
+                              100,
+                              100,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 25,
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.only(right: 12),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.warning_rounded,
+                                    color: Colors.amber,
+                                    size: 25,
+                                  ),
+                                  Text(
+                                    ' الـ QR صالح للاستخدام لمرة واحده فقط ',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.warning_rounded,
+                                    color: Colors.amber,
+                                    size: 25,
+                                  ),
+                                  Text(
+                                    ' الـ QR  صالح لمدة 24 ساعة',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.warning_rounded,
+                                    color: Colors.amber,
+                                    size: 25,
+                                  ),
+                                  Text(
+                                    ' يرجى قراءة ال QR عند الخروج ',
+                                    style: TextStyle(
+                                      color: Colors.red,
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -64,7 +161,7 @@ class GenerateQRCode extends StatelessWidget {
                 ),
               ),
               const SizedBox(
-                height: 200,
+                height: 30,
               ),
             ],
           ),
