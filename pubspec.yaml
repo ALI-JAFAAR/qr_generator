@@ -1,7 +1,7 @@
 name: qr_generator
 description: A new Flutter project.
 publish_to: 'none' 
-version: 1.0.0+1
+version: 1.0.2+2
 environment:
   sdk: '>=3.0.6 <4.0.0'
 dependencies:
@@ -16,11 +16,12 @@ dependencies:
   share: ^2.0.4
   path_provider: ^2.1.0
   screenshot: ^2.1.0
-  onesignal_flutter: ^5.0.0
+  onesignal_flutter: ^5.0.1
   provider: ^5.0.0
   shared_preferences: ^2.0.6
   firebase_messaging: ^14.6.7
-  flutter_local_notifications: ^15.1.1
+  easy_splash_screen: ^1.0.4
+  lottie: ^2.5.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

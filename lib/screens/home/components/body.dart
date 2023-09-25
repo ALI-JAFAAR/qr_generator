@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '/screens/update/update.dart';
 import '/provider/app.dart';
 
 import '../../../provider/user.dart';
@@ -18,14 +19,13 @@ class _BodyWidgetState extends State<BodyWidget> {
   final _formKey = GlobalKey<FormState>();
   bool _isChecked = false;
   String _name = '';
-  String _number = '';
   String _period = '';
-  String _selectedOption = 'اختر صلة القرابة';
   final RegExp _numbersOnly = RegExp(r'\d+');
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<UserProvider>(context);
     var app = Provider.of<AppProvider>(context);
+    user.settoken();
     return Scaffold(
       drawer: Drawer(
         child: ListView(
@@ -35,6 +35,19 @@ class _BodyWidgetState extends State<BodyWidget> {
                 color: Color(0xff008e9b),
               ),
               child: Text(""),
+            ),
+            ListTile(
+              leading: const Icon(Icons.info),
+              title: const Text("تحديث مدة الزيارة "),
+              trailing: const Icon(Icons.arrow_forward),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const UpdateScreen(),
+                  ),
+                );
+              },
             ),
             ListTile(
               leading: const Icon(Icons.info),
@@ -175,69 +188,6 @@ class _BodyWidgetState extends State<BodyWidget> {
                     },
                   ),
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  height: 50,
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: TextFormField(
-                    decoration: const InputDecoration(
-                      // prefix: Icon(Icons.person),
-                      border: OutlineInputBorder(),
-                      labelText: ' ادخل رقم العجلة ',
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
-                    },
-                    onChanged: (value) {
-                      _number = value;
-                    },
-                  ),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.9,
-                  child: DropdownButtonHideUnderline(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black26),
-                          borderRadius: BorderRadius.circular(4)),
-                      child: DropdownButton<String>(
-                        borderRadius: BorderRadius.circular(20),
-                        value: _selectedOption,
-                        onChanged: (newValue) {
-                          setState(() {
-                            _selectedOption = newValue!;
-                          });
-                        },
-                        items: <String>[
-                          'اختر صلة القرابة',
-                          'صديق',
-                          'اقارب',
-                          'عمل'
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                value,
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ),
                 const SizedBox(height: 30),
                 Row(
                   children: [
@@ -257,7 +207,7 @@ class _BodyWidgetState extends State<BodyWidget> {
                       ],
                     ),
                     const Flexible(
-                      child: Text( 
+                      child: Text(
                         'اتعهد بتحمل كافة المسؤليات في حال مخالفة الزائر للقوانين والضوابط الخاصة بالمجمع السكني',
                         style: TextStyle(fontSize: 15),
                       ),
@@ -276,13 +226,15 @@ class _BodyWidgetState extends State<BodyWidget> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
+                        user.settoken();
                         if (_isChecked) {
+                          user.settoken();
                           app.send_order(
-                              _name, _number, _period, user.userdata, context);
+                              _name, _period, user.userdata, context);
                           print("Text Input: $_name");
                           print("Checkbox Checked: $_isChecked");
-                          print("Selected Option: $_selectedOption");
                         } else {
+                          user.settoken();
                           ScaffoldMessenger.of(context)
                               .showSnackBar(const SnackBar(
                             content: Text(

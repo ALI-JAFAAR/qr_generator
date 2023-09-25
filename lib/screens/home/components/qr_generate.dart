@@ -19,6 +19,7 @@ class GenerateQRCode extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var user = Provider.of<UserProvider>(context);
+    
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(

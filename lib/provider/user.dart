@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, non_constant_identifier_names, use_build_context_synchronously
+// ignore_for_file: prefer_typing_uninitialized_variables, non_constant_identifier_names, use_build_context_synchronously, avoid_print
 
 import 'dart:convert';
 
@@ -21,102 +21,90 @@ class UserProvider extends ChangeNotifier {
   bool login = false;
   late SnackBar snackBar;
   String verificationId = "";
-
+  String sms = "";
+  final auth = FirebaseAuth.instance;
   auth_user(context, text) async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    PhoneAuthCredential credential = PhoneAuthProvider.credential(
-        verificationId: verificationId, smsCode: text);
-    await auth.signInWithCredential(credential);
-    auth.currentUser!.displayName;
-    if (auth.currentUser != null) {
-      Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
-              ),
-            );
-     
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    try {
+      var credential = await auth.signInWithCredential(
+          PhoneAuthProvider.credential(
+              verificationId: verificationId, smsCode: text));
+      if (credential.user != null) {
+        localStorage.setInt('id', userdata.id);
+        localStorage.setString('name', userdata.name);
+        localStorage.setString('phone', userdata.phone);
+        localStorage.setString('birth', userdata.birth.toString());
+        localStorage.setString('gender', userdata.gender);
+        localStorage.setString('study', userdata.study);
+        localStorage.setString('worktype', userdata.worktype);
+        localStorage.setString('workplace', userdata.workplace);
+        localStorage.setString('phone', userdata.phone);
+        localStorage.setString('qrstatus', userdata.qrstatus);
+        localStorage.setString('fcmtoken', userdata.fcmtoken);
+        localStorage.setInt('real_id', userdata.realestates[0].id);
+        localStorage.setInt('pid', userdata.realestates[0].pid);
+        localStorage.setString('compound', userdata.realestates[0].compound);
+        localStorage.setString('address', userdata.realestates[0].address);
+        localStorage.setString(
+            'realestateownername', userdata.realestates[0].realestateownername);
+        localStorage.setString('relation', userdata.realestates[0].relation);
+        localStorage.setString(
+            'housingstatus', userdata.realestates[0].housingstatus);
+        login = true;
+        notifyListeners();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomeScreen(),
+          ),
+        );
+      }
+    } catch (error) {
+      snackbar(context, "رمز التحقق خاطئ");
     }
   }
 
   userlogin(BuildContext context, phone) async {
-    // final x = await newMethod(
-    //     'https://www.almawadda-software.com/cims/api/CheckServices.php?Phone=$phone');
-    // if (x.body == "Error") {
-    //   snackbar(context, ' رقم الهاتف غير موجود يرجى مراجعة قسم المعلوماتية ');
-    //   return;
-    // } else {
-      SharedPreferences localStorage = await SharedPreferences.getInstance();
-      final response = await newMethod(
-          'https://almawadda-software.com/cims/api/GetPersonalData.php?Phone=$phone');
+    final x = await newMethod(
+        'https://www.almawadda-software.com/cims/api/CheckServices.php?Phone=$phone');
+    if (x.body == "Error") {
+      snackbar(context, "رقم الهاتف غير موجود يرجى مراجعة الادارة المحلية");
+      return;
+    } else if (x.body == "true") {
+      snackbar(context, "رقم الهاتف موجود لم يدفع خدمات");
+      return;
+    }  else {
+      final response = await newMethod('https://almawadda-software.com/cims/api/GetPersonalData.php?Phone=$phone');
       if (response.statusCode == 200) {
 
+
+
+
+
+        List<List<Customer>> logindata = customerFromJson(response.body);
+        userdata = logindata[0][0];
+        notifyListeners();
+        print("sdjcbisdbflkjvbsiudfbvbisidfbvif = ${userdata.realestates[0].housingstatus}");
+        if(userdata.realestates[0].housingstatus != "ساكن"){
+          snackbar(context, "الخدمة متوفرة للساكنين فقط");
+          return;
+        }
         var phoneNumber = phone;
         phoneNumber = phoneNumber.replaceAll(RegExp(r'[^0-9]'), '');
         phoneNumber = phoneNumber.replaceFirst(RegExp(r'^0+'), '');
         phoneNumber = phoneNumber.replaceFirst('+964', '');
         phoneNumber = '+964$phoneNumber';
-        if (kDebugMode) {
-          print(phoneNumber);
-          print(response.body);
-        }
-        await FirebaseAuth.instance.verifyPhoneNumber(
-          phoneNumber: phoneNumber,
-          verificationCompleted: (PhoneAuthCredential credential) {},
-          verificationFailed: (FirebaseAuthException e) {},
-          codeSent: (String verificationId, int? resendToken) {
-            set_verfy(verificationId);
-            List<List<Customer>> logindata = customerFromJson(response.body);
-            userdata = logindata[0][0];
-            if (kDebugMode) {
-              print("login is occred");
-            }
-             
-      localStorage.setInt('id', userdata.id);
-      localStorage.setString('name', userdata.name);
-      localStorage.setString('phone', userdata.phone);
-      localStorage.setString('birth', userdata.birth.toString());
-      localStorage.setString('gender', userdata.gender);
-      localStorage.setString('study', userdata.study);
-      localStorage.setString('worktype', userdata.worktype);
-      localStorage.setString('workplace', userdata.workplace);
-      localStorage.setString('phone', userdata.phone);
-      localStorage.setString('qrstatus', userdata.qrstatus);
-      localStorage.setString('fcmtoken', userdata.fcmtoken);
-      localStorage.setInt('real_id', userdata.realestates[0].id);
-      localStorage.setInt('pid', userdata.realestates[0].pid);
-      localStorage.setString('compound', userdata.realestates[0].compound);
-      localStorage.setString('address', userdata.realestates[0].address);
-      localStorage.setString(
-          'realestateownername', userdata.realestates[0].realestateownername);
-      localStorage.setString('relation', userdata.realestates[0].relation);
-      localStorage.setString(
-          'housingstatus', userdata.realestates[0].housingstatus);
-      login = true;
 
-      var id = OneSignal.User.pushSubscription.id;
-      fcmtoken(context, userdata.phone, id);
-    
-            notifyListeners();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const OTPScreen(),
-              ),
-            );
-          },
-          codeAutoRetrievalTimeout: (String verificationId) {
-          },
-        );
+        sendotp(context, phoneNumber, response);
       }
-    // }
+    }
   }
 
   check_login(context) async {
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     if (login == true) {
       var id = OneSignal.User.pushSubscription.id;
-      fcmtoken(context, localStorage.getString('phone')!, id);
+      fcmtoken(context, id);
     } else {
       if (localStorage.getInt('id') != null) {
         Realestate resl = Realestate(
@@ -146,12 +134,12 @@ class UserProvider extends ChangeNotifier {
         userdata = da;
         login = true;
         var id = OneSignal.User.pushSubscription.id;
-        fcmtoken(context, localStorage.getString('phone')!, id);
+        fcmtoken(context, id);
         if (kDebugMode) {
           print("user login id = ${userdata.id}");
           var token = OneSignal.User.pushSubscription.id;
           print("token token = $token");
-          fcmtoken(context, userdata.phone, token);
+          fcmtoken(context, token);
         }
         notifyListeners();
       } else {
@@ -182,7 +170,6 @@ class UserProvider extends ChangeNotifier {
     localStorage.remove('housingstatus');
     localStorage.remove('realestateownername');
     localStorage.remove('relation');
-
     login = false;
     snackbar(context, "تم تسجيل الخروج");
     notifyListeners();
@@ -247,49 +234,107 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  fcmtoken(context, phone, token) async {
-    final x = await newMethod(
-        'https://almawadda-software.com/cims/api/UpdateFCMToken.php?Phone=$phone&FCMToken=$token');
-    if (x.body != "Done") {
-      snackbar(context, ' حدث خطا في تحديث كود الاشعار ');
-      return;
+  fcmtoken(context, token) async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var phone = localStorage.getString('phone');
+
+    if (phone != null) {
+      if (token != null) {
+        localStorage.setString('fcmtoken', token);
+        final x = await newMethod(
+            'https://almawadda-software.com/cims/api/UpdateFCMToken.php?Phone=$phone&FCMToken=$token');
+        if (x.body != "Done") {
+          return;
+        }
+      } else {
+        var tokens = OneSignal.User.pushSubscription.id ?? "";
+        localStorage.setString('fcmtoken', tokens);
+        final x = await newMethod(
+            'https://almawadda-software.com/cims/api/UpdateFCMToken.php?Phone=$phone&FCMToken=$tokens');
+        if (x.body != "Done") {
+          return;
+        }
+      }
     }
   }
 
   void snackbar(context, String text) {
     showDialog(
-        context: context,
-        builder: (_) {
-          return Directionality(
-            textDirection: TextDirection.rtl,
-            child: AlertDialog(
-              content: Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-                textDirection: TextDirection.rtl,
+      context: context,
+      builder: (_) {
+        return Directionality(
+          textDirection: TextDirection.rtl,
+          child: AlertDialog(
+            content: Text(
+              text,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text(
-                    'اخفاء',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: mainColor,
-                    ),
+              textDirection: TextDirection.rtl,
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'اخفاء',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: mainColor,
                   ),
                 ),
-              ],
-            ),
-          );
-        });
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void set_verfy(v) {
     verificationId = v;
     notifyListeners();
+  }
+
+  sendotp(context, phoneNumber, response) async {
+    print("otp init");
+    auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (credential) async {
+        await auth.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {},
+      codeSent: (String verificationId, int? resendToken) {
+        set_verfy(verificationId);
+        
+        var id = OneSignal.User.pushSubscription.id;
+        fcmtoken(context, id);
+        print("otp sent");
+        notifyListeners();
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const OTPScreen(),
+          ),
+        );
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+  }
+
+  settoken() async {
+    SharedPreferences localStorage = await SharedPreferences.getInstance();
+    var token = localStorage.getString('fcmtoken');
+    print("token token = $token");
+    if (token != null) {
+      localStorage.setString('fcmtoken', token);
+      print("token token = $token");
+    } else {
+      var id = OneSignal.User.pushSubscription.id;
+      if (id != null) {
+        localStorage.setString('fcmtoken', id);
+        print("token token = $id");
+      }
+    }
   }
 }

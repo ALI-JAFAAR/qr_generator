@@ -1,8 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'package:easy_splash_screen/easy_splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '/provider/app.dart';
 import 'package:flutter/material.dart';
@@ -25,22 +27,20 @@ void main() async {
   final noti = FirebaseMessaging.instance;
   noti.requestPermission();
   OneSignal.initialize("e5a3dda9-5c1b-490e-92bc-f7a3b257cef5");
+  print(" this is the device token = ${OneSignal.User.pushSubscription.id}");
+
   OneSignal.Notifications.addForegroundWillDisplayListener((event) {
     /// preventDefault to not display the notification
     event.preventDefault();
-
-    /// Do async work
-
-    /// notification.display() to display after preventing default
     event.notification.display();
   });
   OneSignal.Notifications.addClickListener((event) {
     print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
   });
   OneSignal.Notifications.requestPermission(true);
-
-  OneSignal.User.pushSubscription.optIn();
-  OneSignal.User.pushSubscription.id;
+  if (OneSignal.User.pushSubscription.optedIn == false) {
+    OneSignal.User.pushSubscription.optIn();
+  }
 
   runApp(
     MultiProvider(
@@ -68,7 +68,14 @@ class MyApp extends StatelessWidget {
         primaryColor: kPrimarycolor,
         textTheme: GoogleFonts.cairoTextTheme(),
       ),
-      home: const HomeScreen(),
+      home: EasySplashScreen(
+        logo: Lottie.asset('assets/images/data.json'),
+        logoWidth: 200,
+        backgroundColor: Colors.white,
+        navigator: const HomeScreen(),
+        showLoader: true,
+        durationInSeconds: 3,
+      ),
     );
   }
 }

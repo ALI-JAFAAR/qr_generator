@@ -30,7 +30,7 @@ apply plugin: 'com.google.gms.google-services'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
-    namespace "com.example.qr_generator"
+    namespace "com.ALi_Jaafar95.qr_generator"
     compileSdk 34
     ndkVersion flutter.ndkVersion
 
@@ -50,10 +50,11 @@ android {
     defaultConfig {
         applicationId "com.ALi_Jaafar95.qr_generator"
         minSdkVersion 21
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdk 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
+
     signingConfigs {
         config {
             storeFile file('../ali.jks')
@@ -62,6 +63,7 @@ android {
             keyPassword 'ALI098'
         }
     }
+
     buildTypes {
         debug {
             signingConfig signingConfigs.config
@@ -79,9 +81,10 @@ flutter {
 }
 
 dependencies {
+    //noinspection GradleDependency
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation(platform("com.google.firebase:firebase-bom:32.2.2"))
+    implementation(platform('com.google.firebase:firebase-bom:32.3.1'))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-auth-ktx")
-    implementation 'com.google.firebase:firebase-messaging:20.0.0'
+    implementation 'com.google.firebase:firebase-messaging:23.2.1'
 }

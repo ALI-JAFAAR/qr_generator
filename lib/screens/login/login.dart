@@ -1,6 +1,5 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, use_build_context_synchronously, unused_local_variable, prefer_interpolation_to_compose_strings, avoid_print
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -31,9 +30,6 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
     var user = Provider.of<UserProvider>(context);
-    if (FirebaseAuth.instance.currentUser != null) {
-      FirebaseAuth.instance.currentUser!.delete();
-    }
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
